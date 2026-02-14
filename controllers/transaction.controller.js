@@ -1,12 +1,11 @@
 const Transaction = require("../models/transaction.model")
-
 const asyncHandler = require("express-async-handler")
 
 // Get all transaction
 // GET api/transaction
 // public access
 const getTransactions = asyncHandler(async (req, res) => {
-    const transactions = await Transaction.find()
+    const transactions = await Transaction.findAll()
 
     if(transactions.length === 0) {
         return res.status(200).json({ message: "Transactions are empty", data: [] })
@@ -39,7 +38,7 @@ const createTransaction = asyncHandler(async (req, res) => {
 // GET api/transaction/:id
 // public access
 const getTransaction = asyncHandler(async (req, res) => {
-    const transaction = await Transaction.findById(req.params.id)
+    const transaction = await Transaction.findByPk(req.params.id)
     if(!transaction) {
         res.status(404)
         throw new Error("Transaction not found")
@@ -51,17 +50,18 @@ const getTransaction = asyncHandler(async (req, res) => {
 // PUT api/transaction/:id
 // public access
 const updateTransaction = asyncHandler(async (req, res) => {
-    const transaction = await Transaction.findById(req.params.id)
+    const transaction = await Transaction.findByPk(req.params.id)
 
     if(!transaction){
         res.status(404)
         throw new Error("Transaction not found")
     }
 
-const updatedTransaction = await Transaction.findByIdAndUpdate(
-        req.params.id,
+const updatedTransaction = await Transaction.update(
         req.body,
-        {new: true, runValidators: true}
+        {
+            where: {id: req.params.id}
+        }
     )
     res.status(200).json(updatedTransaction)
 })
@@ -70,19 +70,19 @@ const updatedTransaction = await Transaction.findByIdAndUpdate(
 // DELETE api/transaction/:id
 // public access
 const deleteTransaction = asyncHandler(async (req, res) => {
-    const transaction = await Transaction.findById(req.params.id)
+    const transaction = await Transaction.findByPk(req.params.id)
 
     if(!transaction){
         res.status(404)
         throw new Error("Transaction not found")
     }
 
-    await transaction.deleteOne()
+    await transaction.destroy()
     res.status(200).json({message: `${transaction.title} Transaction deleted successfully`})
 })
 
 const getSummary = asyncHandler(async (req, res) => {
-    const transactions = await Transaction.find()
+    const transactions = await Transaction.findAll()
 
     const income = transactions
         .filter(t => t.type === "income")

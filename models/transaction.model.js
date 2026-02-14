@@ -1,30 +1,27 @@
-const mongoose = require("mongoose")
+const { DataTypes } = require("sequelize")
+const { sequelize } = require("../config/dbconnection")
 
-
-const transactionSchema = new mongoose.Schema({
-    title:{
-        type: String,
-        required: [true, "Title is required"]
+const Transaction = sequelize.define("Transaction", {
+    title: {
+        type: DataTypes.STRING,
+        allowNull: false
     },
     amount: {
-        type: Number,
-        required: [true, "Amount is required"]
+        type: DataTypes.FLOAT,
+        allowNull: false
     },
     type: {
-        type: String,
-        enum: ["income", "expense"],
-        required: true
+        type: DataTypes.ENUM("income", "expense"),
+        allowNull: false
     },
     category: {
-        type: String,
-        required: true
+        type: DataTypes.STRING,
+        allowNull: false    
     },
     date: {
-        type: Date,
-        default: Date.now
+        type: DataTypes.DATE,
+        defaultValue: DataTypes.NOW
     }
-}, {
-    timestamps: true
 })
 
-module.exports = mongoose.model("Transaction", transactionSchema)
+module.exports = Transaction
